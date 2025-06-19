@@ -5,7 +5,9 @@ import crud.model.User;
 import org.hibernate.Session;
 
 public class UserDaoImpl implements UserDao {
-    private final String nameTable = HibernateConfig.loadProperties().getProperty("hibernate.name_table");
+
+    public final HibernateConfig hibernateConfig = new HibernateConfig();
+    private final String nameTable = hibernateConfig.loadProperties().getProperty("hibernate.name_table");
 
     @Override
     public void createUsersTable(Session session) {

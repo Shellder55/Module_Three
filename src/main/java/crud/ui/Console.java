@@ -3,7 +3,6 @@ package crud.ui;
 import crud.model.User;
 import crud.service.UserServiceImpl;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
 
@@ -11,10 +10,11 @@ public class Console {
 
     private final UserServiceImpl userService;
     private final Scanner scanner;
-    private static final Logger logger = LoggerFactory.getLogger(Console.class);
+    private final Logger logger;
 
-    public Console(UserServiceImpl userService) {
+    public Console(UserServiceImpl userService, Logger logger) {
         this.userService = userService;
+        this.logger = logger;
         this.scanner = new Scanner(System.in);
     }
 

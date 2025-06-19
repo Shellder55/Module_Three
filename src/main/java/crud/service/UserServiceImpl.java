@@ -2,22 +2,28 @@ package crud.service;
 
 import crud.config.DaoException;
 import crud.config.EntityNotFoundException;
-import crud.config.HibernateConfig;
 import crud.dao.UserDaoImpl;
 import crud.model.User;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UserServiceImpl implements UserService {
-    private final UserDaoImpl userDao = new UserDaoImpl();
+    private final UserDaoImpl userDao;
     private static Transaction transaction = null;
-    private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class.getName());
+    private final SessionFactory sessionFactory;
+    private final Logger logger;
+
+    public UserServiceImpl(UserDaoImpl userDao, SessionFactory sessionFactory, Logger logger) {
+        this.userDao = userDao;
+        this.sessionFactory = sessionFactory;
+        this.logger = logger;
+    }
 
     @Override
     public void createUsersTable() {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             userDao.createUsersTable(session);
             transaction.commit();
@@ -29,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void dropUsersTable() {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             userDao.dropUsersTable(session);
             transaction.commit();
@@ -41,19 +47,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(User user) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             userDao.createUser(user, session);
             transaction.commit();
         } catch (Exception e) {
-            logger.error("Error saving user: " + e.getMessage());
             rollbackMethod();
+            throw new DaoException("Error saving user: ", e);
         }
     }
 
     @Override
     public void updateUser(Long id, String name, String email, Integer age) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             userDao.updateUser(id, session, name, email, age);
             transaction.commit();
@@ -65,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void getUserById(Long id) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             User user = userDao.getUserById(id, session);
             transaction.commit();
@@ -82,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             User user = userDao.getUserById(id, session);
             if (user == null) {

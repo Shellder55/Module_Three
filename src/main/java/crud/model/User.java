@@ -2,6 +2,7 @@ package crud.model;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,13 +19,19 @@ public class User {
     @Column(name = "age", nullable = false)
     private Integer age;
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private Instant created_at = Instant.now();
 
     public User(String name, String email, Integer age) {
         this.name = name;
         this.email = email;
         this.age = age;
-        this.created_at = LocalDateTime.now();
+    }
+
+    public User(Long id, String name, String email, Integer age, LocalDateTime created_at) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.age = age;
     }
 
     public User() {
@@ -63,7 +70,7 @@ public class User {
         this.age = age;
     }
 
-    public LocalDateTime getCreated_at() {
+    public Instant getCreated_at() {
         return created_at;
     }
 
